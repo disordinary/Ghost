@@ -254,7 +254,7 @@ ConfigManager.prototype.set = function (config) {
             subscribe: 'subscribe',
             amp: 'amp'
         },
-        internalApps: ['private-blogging', 'subscribers', 'amp'],
+        internalApps: ['private-blogging', 'subscribers', 'amp', 'image-optimisation'],
         slugs: {
             // Used by generateSlug to generate slugs for posts, tags, users, ..
             // reserved slugs are reserved but can be extended/removed by apps

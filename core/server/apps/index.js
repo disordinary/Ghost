@@ -12,7 +12,6 @@ var _           = require('lodash'),
 function getInstalledApps() {
     return api.settings.read({context: {internal: true}, key: 'installedApps'}).then(function (response) {
         var installed = response.settings[0];
-
         installed.value = installed.value || '[]';
 
         try {
