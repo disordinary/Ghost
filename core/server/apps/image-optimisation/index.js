@@ -8,11 +8,14 @@ var config     = require('../../config'),
 
 module.exports = {
     activate: function activate(app) {
+        if(!(config.hasOwnProperty('imageOptimisation')
+            && config.imageOptimisation.hasOwnProperty('url'))) {
+            return;
+        }
+
         app.filters.register("prePostsRender" , function( post) {
-
             post.html = post.html.replace(/(<img.*src=["|'])(\/content\/images\/)([^"&^']*["|'])/g,
-                "$1http://ghost.org/$3");
-
+                "$1" + config.imageOptimisation.url + "$3");
             return post;
         });
     }
