@@ -8,8 +8,10 @@ var config     = require('../../config'),
 
 module.exports = {
     activate: function activate(app) {
+
         if(!(config.hasOwnProperty('imageOptimisation')
             && config.imageOptimisation.hasOwnProperty('url'))) {
+            //image optimisation isn't in the configuration file.
             return;
         }
 
