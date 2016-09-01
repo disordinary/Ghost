@@ -1,7 +1,9 @@
 var config     = require('../../config'),
     errors     = require('../../errors'),
-    i18n       = require('../../i18n');
+    generatePath = require('./lib/generatePath.js');
 
+
+var WIDTH = 800; //the image width, it's a constant right now but will change TODO
 
 
 
@@ -10,14 +12,21 @@ module.exports = {
     activate: function activate(app) {
 
         if(!(config.hasOwnProperty('imageOptimisation')
-            && config.imageOptimisation.hasOwnProperty('url'))) {
+            && config.imageOptimisation.hasOwnProperty('domain'))) {
             //image optimisation isn't in the configuration file.
             return;
         }
 
         app.filters.register("prePostsRender" , function( post) {
-            post.html = post.html.replace(/(<img.*src=["|'])(\/content\/images\/)([^"&^']*["|'])/g,
-                "$1" + config.imageOptimisation.url + "$3");
+            if( post instanceof Array ) {
+                //there is no images in the short form.
+                return post;
+            }
+            post.html = post.html.replace(/(<img.*src=["|'])(\/content\/images\/[^"&^']*)(["|'])/g,
+                function(match, p1, p2, p3, offset, string) {
+                    console.log(match, p1, p2, p3, offset, string);
+                    return generatePath(config, WIDTH, match);
+                });
             return post;
         });
     }
