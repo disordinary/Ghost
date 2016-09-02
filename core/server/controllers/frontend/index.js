@@ -13,7 +13,8 @@ var api         = require('../../api'),
     postLookup     = require('./post-lookup'),
     setResponseContext = require('./context'),
     setRequestIsSecure = require('./secure'),
-
+    path            = require('path'),
+    Promise         = require('bluebird'),
     frontendControllers;
 
 /*
@@ -22,6 +23,8 @@ var api         = require('../../api'),
 * and single post methods.
 * Returns a function that takes the post to be rendered.
 */
+
+
 function renderPost(req, res) {
     return function renderPost(post) {
         var view = templates.single(req.app.get('activeTheme'), post),
@@ -77,11 +80,31 @@ frontendControllers = {
             }
 
             setRequestIsSecure(req, post);
+            setupApps(post)
+                .then(filters.doFilter('prePostsRender', post, res.locals) //this is @DEPRICATED
+                .then(renderPost(req, res)));
 
-            filters.doFilter('prePostsRender', post, res.locals)
-                .then(renderPost(req, res));
         }).catch(handleError(next));
     }
 };
+
+
+// blatantly borrowed from frontend routes
+// setup routes for internal apps
+// @TODO: refactor this to be a proper app route hook for internal & external apps
+function setupApps(post) {
+
+    var apps = config.internalApps.reduce(function (arr, appName) {
+        var app = require(path.join(config.paths.internalAppPath, appName));
+        if (app.hasOwnProperty('setupFilters')) {
+            //for Promise.all it needs to be "thenable", which simply means:
+             arr.push({
+                 then: function( ) { app.setupFilters(post); }
+             });
+        }
+        return arr;
+    }, [ ]);
+    return Promise.all( apps );
+}
 
 module.exports = frontendControllers;

@@ -9,7 +9,7 @@ var WIDTH = 800; //the image width, it's a constant right now but will change TO
 
 
 module.exports = {
-    activate: function activate(app) {
+    activate: function(app) {
 
         if(!(config.hasOwnProperty('imageOptimisation')
             && config.imageOptimisation.hasOwnProperty('domain'))) {
@@ -22,12 +22,20 @@ module.exports = {
                 //there is no images in the short form.
                 return post;
             }
+
+
             post.html = post.html.replace(/(<img.*src=["|'])(\/content\/images\/[^"&^']*)(["|'])/g,
                 function(match, p1, p2, p3, offset, string) {
-                    console.log(match, p1, p2, p3, offset, string);
+                    //console.log(match, p1, p2, p3, offset, string);
                     return generatePath(config, WIDTH, match);
                 });
             return post;
         });
+    },
+
+    setupFilters: function(post) {
+        console.log("FILTER SETUP");
     }
+
+
 };
