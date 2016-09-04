@@ -17,7 +17,7 @@ function generatePath(config, width, url) {
 function generateImgixURL(config, width, url) {
     var imgix = new Imgix({
         host: config.domain,
-        secureURLToken: config.tokey
+        secureURLToken: config.token
     });
 
     return imgix.buildURL(url, {

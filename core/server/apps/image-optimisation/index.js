@@ -1,5 +1,6 @@
 var config     = require('../../config'),
     errors     = require('../../errors'),
+    Promise         = require('bluebird'),
     generatePath = require('./lib/generatePath.js');
 
 
@@ -10,32 +11,42 @@ var WIDTH = 800; //the image width, it's a constant right now but will change TO
 
 module.exports = {
     activate: function(app) {
-
-        if(!(config.hasOwnProperty('imageOptimisation')
-            && config.imageOptimisation.hasOwnProperty('domain'))) {
-            //image optimisation isn't in the configuration file.
-            return;
-        }
-
-        app.filters.register("prePostsRender" , function( post) {
-            if( post instanceof Array ) {
-                //there is no images in the short form.
-                return post;
-            }
-
-
-            post.html = post.html.replace(/(<img.*src=["|'])(\/content\/images\/[^"&^']*)(["|'])/g,
-                function(match, p1, p2, p3, offset, string) {
-                    //console.log(match, p1, p2, p3, offset, string);
-                    return generatePath(config, WIDTH, match);
-                });
-            return post;
-        });
     },
 
-    setupFilters: function(post) {
-        console.log("FILTER SETUP");
+    contentFilter: function(post) {
+        return replaceImagesInPost(post);
     }
 
 
 };
+
+
+function replaceImagesInPost(post) {
+    post.html = post.html.replace(/(<img.*src=["|'])(\/content\/images\/[^"&^']*)(["|'])([^>]*>)/g,
+        function(match, tagOpen, imagePath, imageStringCLose, tagClose) {
+
+
+            generateSrcset(config.imageCDN, config.url + '/' + imagePath)
+                .then(function(srcSet) {
+                    console.log(results)
+                });
+
+            var defaultImage = generatePath(config.imageCDN, config.imageCDN.sizes[0], config.url + "/" + imagePath);
+            return tagOpen + imagePathToCDN + imageStringCLose + " style='border:10px solid pink;'" + tagClose;
+
+        });
+
+
+    return post;
+}
+
+function generateSrcset(config, url) {
+    return new Promise(function (resolve, reject) {
+        Promise.map(config.sizes, function(size) {
+            return generatePath(config, size, url) + " " + size + "w";
+        }).then( function(results) {
+            resolve(srcset='"' + results.join() + '"');
+        });
+    });
+
+}
