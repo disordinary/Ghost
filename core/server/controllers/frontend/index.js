@@ -81,12 +81,8 @@ frontendControllers = {
             }
 
             setRequestIsSecure(req, post);
-         //   console.log( "filter", filters.doFilter );
-         //   var filter = filters.doFilter('prePostsRender', post, res.locals);
-         //    console.log( "filter run", filter);
-         //    console.log(" SFILSDFS D" , filter.then());
 
-
+            //Runs the post through any app filters.
             filterContent(post)
                 .then(filters.doFilter('prePostsRender', post, res.locals) //this is @DEPRECATED
                 .then(renderPost(req, res)));

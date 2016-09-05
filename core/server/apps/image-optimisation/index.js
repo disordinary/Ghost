@@ -31,17 +31,16 @@ function replaceImagesInPost(post) {
             var defaultImage = generatePath(config.imageCDN, config.imageCDN.sizes[0], imageURL);
             var srcSet       = generateSrcset(config, imageURL);
             return tagOpen + defaultImage + imageStringCLose + srcSet + " style='border:3px solid red;'" + tagClose;
-
         });
-
-
     return post;
 }
 
 function generateSrcset(config, url) {
     var srcSet = config.imageCDN.sizes.map(function(size) {
+        console.log( size);
         return generatePath(config.imageCDN, size, url) + " " + size + "w";
     });
-    return ' srcset="' + srcSet.join() + '"';
+
+    return ' srcset="' + srcSet.join(', ') + '"';
 
 }

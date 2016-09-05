@@ -2,16 +2,32 @@ var config      = require('../../../../config'),
 generatePath    = require('../generatePath.js');
 
 registerHelpers = function (ghost) {
-    ghost.helpers.register('sized_image', imageTest);
+    ghost.helpers.register('sized_image', generateResizedImageURL);
 
 };
 
 
-function imageTest(args) {
-    //TODO check to make sure the image is actually hosted by this blog,
-    // i.e. a relative URL or a URL which is from this domkain.
+function generateResizedImageURL(args) {
+    //if the URL doesn't belong to this blog then we don't import it into
+    //the image CDN and just return it unchanged.
 
-    return generatePath(config.imageCDN, args.hash.width, args.hash.url);
+
+    var url = args.hash.url;
+    if(!isThisBlogsURL(url)) {
+        return args.hash.url;
+    }
+    if(url[0]==="/") url = config.url+"/"+url;
+    return generatePath(config.imageCDN, args.hash.width, url);
 }
 
+//checks to see if the URL of the image belongs to this blog or is absolute.
+//TODO make it work with relative URLs
+function isThisBlogsURL(url) {
+    return url.substr(0, config.url.length) === config.url || url[0] === "/";
+}
+
+
+
+
 module.exports = registerHelpers;
+
