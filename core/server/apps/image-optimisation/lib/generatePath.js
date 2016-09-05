@@ -13,7 +13,7 @@ function generatePath(config, width, url) {
     }
 }
 
-
+// generate and sign URL for imgix
 function generateImgixURL(config, width, url) {
     var imgix = new Imgix({
         host: config.domain,

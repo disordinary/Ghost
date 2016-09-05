@@ -1,16 +1,17 @@
 var config     = require('../../config'),
     errors     = require('../../errors'),
     Promise         = require('bluebird'),
-    generatePath = require('./lib/generatePath.js');
+    generatePath = require('./lib/generatePath.js'),
+    registerHelpers     = require('./lib/helpers');
 
 
-var WIDTH = 800; //the image width, it's a constant right now but will change TODO
 
 
 
 
 module.exports = {
-    activate: function(app) {
+    activate: function(ghost) {
+        registerHelpers(ghost);
     },
 
     contentFilter: function(post) {
@@ -25,14 +26,11 @@ function replaceImagesInPost(post) {
     post.html = post.html.replace(/(<img.*src=["|'])(\/content\/images\/[^"&^']*)(["|'])([^>]*>)/g,
         function(match, tagOpen, imagePath, imageStringCLose, tagClose) {
 
+            var imageURL = config.url + "/" + imagePath;
 
-            generateSrcset(config.imageCDN, config.url + '/' + imagePath)
-                .then(function(srcSet) {
-                    console.log(results)
-                });
-
-            var defaultImage = generatePath(config.imageCDN, config.imageCDN.sizes[0], config.url + "/" + imagePath);
-            return tagOpen + imagePathToCDN + imageStringCLose + " style='border:10px solid pink;'" + tagClose;
+            var defaultImage = generatePath(config.imageCDN, config.imageCDN.sizes[0], imageURL);
+            var srcSet       = generateSrcset(config, imageURL);
+            return tagOpen + defaultImage + imageStringCLose + srcSet + " style='border:3px solid red;'" + tagClose;
 
         });
 
@@ -41,12 +39,9 @@ function replaceImagesInPost(post) {
 }
 
 function generateSrcset(config, url) {
-    return new Promise(function (resolve, reject) {
-        Promise.map(config.sizes, function(size) {
-            return generatePath(config, size, url) + " " + size + "w";
-        }).then( function(results) {
-            resolve(srcset='"' + results.join() + '"');
-        });
+    var srcSet = config.imageCDN.sizes.map(function(size) {
+        return generatePath(config.imageCDN, size, url) + " " + size + "w";
     });
+    return ' srcset="' + srcSet.join() + '"';
 
 }
