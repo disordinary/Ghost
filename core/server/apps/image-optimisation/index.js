@@ -23,7 +23,7 @@ module.exports = {
 
 
 function replaceImagesInPost(post) {
-    post.html = post.html.replace(/(<img.*src=["|'])(\/content\/images\/[^"&^']*)(["|'])([^>]*>)/g,
+    post.html = post.html.replace(g,
         function(match, tagOpen, imagePath, imageStringCLose, tagClose) {
 
             var imageURL = config.url + "/" + imagePath;
