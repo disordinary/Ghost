@@ -13,7 +13,8 @@
     "internalApps": [
         "private-blogging",
         "subscribers",
-        "amp"
+        "amp",
+        "default-cards"
     ],
     "routeKeywords": {
         "tag": "tag",
