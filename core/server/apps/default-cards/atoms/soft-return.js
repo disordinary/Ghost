@@ -1,7 +1,7 @@
 var atom = {
     name: 'soft-return',
     type: 'dom',
-    render() {
+    render(opts) {
         return opts.env.dom.createElement('br');
     }
 }
